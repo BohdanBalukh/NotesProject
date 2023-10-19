@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title">Title</string>
+    <string name="category">Category</string>
+    <string name="notes">Notes</string>
+    <string name="date">Date</string>
+</resources>
