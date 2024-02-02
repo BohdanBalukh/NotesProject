@@ -1,31 +1,35 @@
 package com.example.notesproject.Adapters;
 
-
-
-import static com.example.notesproject.MainActivity.cancelSelection;
-import static com.example.notesproject.MainActivity.chooseSelection;
-import static com.example.notesproject.MainActivity.floatingActionButton;
-import static com.example.notesproject.MainActivity.searchView_home;
 import static com.example.notesproject.MainActivity.selectedItemsText;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Typeface;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.notesproject.Database.RoomDB;
-import com.example.notesproject.MainActivity;
 import com.example.notesproject.Models.Notes;
 import com.example.notesproject.NotesClickListener;
 import com.example.notesproject.R;
 import com.google.android.material.card.MaterialCardView;
+import com.makeramen.roundedimageview.RoundedImageView;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +46,8 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
     private List<Integer> selectedItems=new ArrayList<>();
     private NotesClickListener listener;
     private boolean isLongClickMode = false;
+
+    private String searchQuery = "";
 
     public NotesListAdapter(Context context, List<Notes> list, NotesClickListener listener) {
         this.context = context;
@@ -62,47 +68,46 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
         holder.textView_notes.setText(list.get(position).getNotes());
         holder.textView_category.setText(list.get(position).getCategory());
 
+
+        if (list.get(position).getImagePath() != null) {
+            Glide.with(context)
+                    .load(new File(list.get(position).getImagePath()))
+                    .centerCrop()
+                    .override(300, 300)
+                    .into(holder.imageNote);
+
+            holder.imageNote.setVisibility(View.VISIBLE);
+        } else {
+            holder.imageNote.setVisibility(View.GONE);
+        }
+
+        setHighlightText(holder.textView_title, list.get(position).getTitle(), searchQuery);
+        setHighlightText(holder.textView_notes, list.get(position).getNotes(), searchQuery);
+        setHighlightText(holder.textView_category, list.get(position).getCategory(), searchQuery);
+
         setFormattedDate(holder.textView_date,list.get(position).getDate());
 
 
+
         if(list.get(position).isPinned()){
-            holder.imageView_pin.setImageResource(R.drawable.ic_pin);
+            holder.pinLayot.setVisibility(View.VISIBLE);
         }
         else{
-            holder.imageView_pin.setImageResource(0);
+            holder.pinLayot.setVisibility(View.GONE);
         }
 
         boolean isSelected = selectedItems.contains(position);
         holder.notes_container.setChecked(isSelected);
 
 
-
         if(isLongClickMode){
             if(!selectedItems.isEmpty()){
-                selectedItemsText.setText(String.valueOf(selectedItems.size())+" item selected");
+                selectedItemsText.setText(selectedItems.size() +" item selected");
             }
             else{
                 selectedItemsText.setText("Select items");
             }
-            floatingActionButton.setVisibility(View.GONE);
-            searchView_home.setVisibility(View.GONE);
-            chooseSelection.setVisibility(View.VISIBLE);
-            cancelSelection.setVisibility(View.VISIBLE);
-            selectedItemsText.setVisibility(View.VISIBLE);
-            searchView_home.setEnabled(false);
-            floatingActionButton.setEnabled(false);
         }
-        else{
-            floatingActionButton.setVisibility(View.VISIBLE);
-            searchView_home.setVisibility(View.VISIBLE);
-            chooseSelection.setVisibility(View.GONE);
-            cancelSelection.setVisibility(View.GONE);
-            selectedItemsText.setVisibility(View.GONE);
-            searchView_home.setEnabled(true);
-            floatingActionButton.setEnabled(true);
-        }
-
-
         holder.notes_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -146,10 +151,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
     public int getItemCount() {
         return list.size();
     }
-    public void filterList(List<Notes> filteredList){
-        list=filteredList;
-        notifyDataSetChanged();
-    }
+
     public void selectItems() {
         if (selectedItems.size() == getItemCount()) {
             clearSelections();
@@ -233,7 +235,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
         cal2.setTime(date2);
 
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-               cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR);
+                cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR);
     }
     private boolean isSameYear(Date date1, Date date2) {
         Calendar cal1 = Calendar.getInstance();
@@ -244,12 +246,39 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
 
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
     }
+
+    public void filterList(List<Notes> filteredList){
+        list=filteredList;
+        notifyDataSetChanged();
+    }
+    public void setSearchQuery(String query) {
+        searchQuery = query;
+        notifyDataSetChanged();
+    }
+
+    private void setHighlightText(TextView textView, String fullText, String query) {
+        int startPos = fullText.toLowerCase().indexOf(query.toLowerCase());
+        int endPos = startPos + query.length();
+
+        if (startPos != -1) {
+            Spannable spannable = new SpannableString(fullText);
+            ColorStateList colorStateList = new ColorStateList(new int[][]{new int[]{}}, new int[]{context.getResources().getColor(R.color.orange)});
+            TextAppearanceSpan highlightSpan = new TextAppearanceSpan(null, Typeface.BOLD, -1, colorStateList, null);
+            spannable.setSpan(highlightSpan, startPos, endPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            textView.setText(spannable);
+        } else {
+            textView.setText(fullText);
+        }
+    }
+
+
 }
 class NotesViewHolder extends RecyclerView.ViewHolder{
 
     MaterialCardView notes_container;
+    RoundedImageView imageNote;
     TextView textView_title, textView_notes,textView_category,textView_date;
-    ImageView imageView_pin;
+    RelativeLayout pinLayot;
     public NotesViewHolder(@NonNull View itemView) {
         super(itemView);
         notes_container = itemView.findViewById(R.id.notes_container);
@@ -257,7 +286,7 @@ class NotesViewHolder extends RecyclerView.ViewHolder{
         textView_notes = itemView.findViewById(R.id.textView_notes);
         textView_category = itemView.findViewById(R.id.textView_category);
         textView_date = itemView.findViewById(R.id.textView_date);
-        imageView_pin = itemView.findViewById(R.id.imageView_pin);
-
+        imageNote = itemView.findViewById(R.id.imageNote);
+        pinLayot = itemView.findViewById(R.id.pinLayout);
     }
 }

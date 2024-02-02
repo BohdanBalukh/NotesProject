@@ -5,9 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/main_gray"
+    style="@style/Base.Theme.NotesProject"
     tools:context=".MainActivity">
-
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_notes1"
@@ -23,32 +22,38 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_centerInParent="true"
-            app:queryHint="Search notes">
-        </androidx.appcompat.widget.SearchView>
+            app:queryHint="Search notes"></androidx.appcompat.widget.SearchView>
 
-        <ImageView
-            android:id="@+id/cancelSelection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_close"
-            android:visibility="gone"/>
-        <TextView
-            android:id="@+id/selectedItemsText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:textColor="@color/black"
-            android:visibility="gone"/>
-        <ImageView
-            android:id="@+id/chooseSelection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_check_all"
-            android:visibility="gone"/>
+        <LinearLayout
+            android:id="@+id/navLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:gravity="center">
+            <ImageButton
+                android:id="@+id/cancelSelection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_close"
+                style="@style/ElementsColor"
+                android:background="@null"/>
+            <TextView
+                android:id="@+id/selectedItemsText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/Base.Theme.NotesProject"
+                android:gravity="center"/>
+            <ImageButton
+                android:id="@+id/chooseSelection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_check_all"
+                style="@style/ElementsColor"
+                android:background="@null"/>
+        </LinearLayout>
+
     </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 
@@ -56,36 +61,92 @@
         android:id="@+id/recycler_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar_notes1"/>
+        android:layout_below="@+id/toolbar_notes1"
+        android:paddingBottom="100dp"
+        android:clipToPadding="false"/>
 
     <ImageView
         android:id="@+id/notesEmptyImage"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/ic_notes"
+        android:src="@drawable/ic_empty"
         android:layout_centerInParent="true"
+        style="@style/ElementsColor"
         android:visibility="gone"/>
     <TextView
         android:id="@+id/notesEmptyText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/Base.Theme.NotesProject"
         android:text="No notes here yet"
         android:layout_centerInParent="true"
         android:layout_marginTop="24dp"
         android:layout_below="@+id/notesEmptyImage"
         android:visibility="gone"/>
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
-        android:layout_width="wrap_content"
+
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:backgroundTint="@color/orange"
-        app:tint="@color/white"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:src="@drawable/ic_add" />
+        android:layout_alignParentBottom="true">
+        <LinearLayout
+            android:id="@+id/leftButtonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="start">
+            <ImageButton
+                android:id="@+id/switchGridMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_vertical_format"
+                style="@style/ElementsColor"
+                android:background="@null"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/buttonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            style="@style/ColorBottom"
+            android:gravity="center"
+            android:visibility="gone">
+            <ImageButton
+                android:id="@+id/deleteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="60px"
+                android:src="@drawable/ic_delete"
+                android:layout_gravity="center"
+                style="@style/ElementsColor"
+                android:background="@null"/>
+            <ImageButton
+                android:id="@+id/shareButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_share"
+                style="@style/ElementsColor"
+                android:background="@null"/>
+            <ImageButton
+                android:id="@+id/pinButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_pin"
+                android:layout_marginHorizontal="60px"
+                style="@style/ElementsColor"
+                android:background="@null"/>
+        </LinearLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:backgroundTint="@color/orange"
+            app:tint="@color/white"
+            android:src="@drawable/ic_add" />
+    </FrameLayout>
 
 </RelativeLayout>

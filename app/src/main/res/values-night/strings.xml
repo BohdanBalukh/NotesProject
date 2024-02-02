@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">NotesProject</string>
     <string name="title">Title</string>
     <string name="category">Category</string>
     <string name="notes">Notes</string>
     <string name="date">Date</string>
+    <string name="mode">Night</string>
 </resources>
