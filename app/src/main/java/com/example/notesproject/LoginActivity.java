@@ -13,12 +13,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.notesproject.Utility.UiUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements Validable{
 
     EditText emailEditText,passwordEditText;
     Button loginBtn;
@@ -56,7 +57,8 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    void loginUser(){
+    private void loginUser(){
+
         /*
         String email  = emailEditText.getText().toString();
         String password  = passwordEditText.getText().toString();
@@ -67,16 +69,16 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }*/
 
-        loginAccountInFirebase("bohdan.baluh@gmail.com","qwerty123");
+        loginAccountInFirebase("bohdan.baluh@gmail.com","123456");
 
     }
-    void loginAccountInFirebase(String email,String password){
+    private void loginAccountInFirebase(String email,String password){
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        changeInProgress(true);
+        UiUtils.changeInProgress(progressBar,loginBtn,true);
         firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                changeInProgress(false);
+                UiUtils.changeInProgress(progressBar,loginBtn,false);
                 if(task.isSuccessful()){
                     if(firebaseAuth.getCurrentUser().isEmailVerified()){
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -91,18 +93,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-    void changeInProgress(boolean inProgress){
-        if(inProgress){
-            progressBar.setVisibility(View.VISIBLE);
-            loginBtn.setVisibility(View.GONE);
-        }else{
-            progressBar.setVisibility(View.GONE);
-            loginBtn.setVisibility(View.VISIBLE);
-        }
-    }
-
-    boolean validateData(String email,String password){
-
+    @Override
+    public boolean validateData(String... data) {
+        String email = data[0];
+        String password = data[1];
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
             emailEditText.setError("Email is invalid");
             return false;
@@ -113,4 +107,5 @@ public class LoginActivity extends AppCompatActivity {
         }
         return true;
     }
+
 }

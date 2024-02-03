@@ -3,6 +3,7 @@ package com.example.notesproject;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -12,17 +13,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.notesproject.Utility.UiUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class SignupActivity extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity implements Validable{
 
     EditText emailEditText,passwordEditText,confirmPasswordEditText;
     Button createAccountBtn;
     ProgressBar progressBar;
-    TextView loginBtnTextView;
+    TextView goBackToLogin;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +35,7 @@ public class SignupActivity extends AppCompatActivity {
         confirmPasswordEditText = findViewById(R.id.confirm_password_edit_text);
         createAccountBtn = findViewById(R.id.create_account_btn);
         progressBar = findViewById(R.id.progress_bar);
-        loginBtnTextView = findViewById(R.id.login_text_view_btn);
+        goBackToLogin = findViewById(R.id.goBackToLogin);
 
         createAccountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,7 +43,7 @@ public class SignupActivity extends AppCompatActivity {
                 createAccount();
             }
         });
-        loginBtnTextView.setOnClickListener(new View.OnClickListener() {
+        goBackToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
@@ -64,14 +66,14 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     void createAccountInFirebase(String email,String password){
-        changeInProgress(true);
+        UiUtils.changeInProgress(progressBar,createAccountBtn,true);
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(SignupActivity.this,
                 new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        changeInProgress(false);
+                        UiUtils.changeInProgress(progressBar,createAccountBtn,false);
                         if(task.isSuccessful()){
                             Toast.makeText(SignupActivity.this,"Account has been created. Please, check email to verify", Toast.LENGTH_SHORT).show();
                             firebaseAuth.getCurrentUser().sendEmailVerification();
@@ -85,16 +87,12 @@ public class SignupActivity extends AppCompatActivity {
         );
     }
 
-    void changeInProgress(boolean inProgress){
-        if(inProgress){
-            progressBar.setVisibility(View.VISIBLE);
-            createAccountBtn.setVisibility(View.GONE);
-        }else{
-            progressBar.setVisibility(View.GONE);
-            createAccountBtn.setVisibility(View.VISIBLE);
-        }
-    }
-    boolean validateData(String email,String password,String confirmPassword){
+
+    @Override
+    public boolean validateData(String... data) {
+        String email = data[0];
+        String password = data[1];
+        String confirmPassword = data[2];
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
             emailEditText.setError("Email is invalid");
