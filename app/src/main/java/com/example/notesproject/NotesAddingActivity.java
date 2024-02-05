@@ -16,7 +16,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.window.OnBackInvokedDispatcher;
 
 
 import androidx.annotation.NonNull;
@@ -26,16 +25,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 
-import com.example.notesproject.Adapters.NotesListAdapter;
 import com.example.notesproject.Models.Notes;
+import com.example.notesproject.Utility.TextViewUndoRedo;
 import com.makeramen.roundedimageview.RoundedImageView;
 
-import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 
 public class NotesAddingActivity extends AppCompatActivity {

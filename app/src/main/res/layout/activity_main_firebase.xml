@@ -12,51 +12,51 @@
         android:id="@+id/toolbar_notes1"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="18dp">
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView_home"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_centerInParent="true"
-            app:queryHint="Search notes"></androidx.appcompat.widget.SearchView>
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="18dp">
 
-        <LinearLayout
-            android:id="@+id/navLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:gravity="center">
-            <ImageButton
-                android:id="@+id/cancelSelection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/ic_close"
-                style="@style/ElementsColor"
-                android:background="@null"/>
-            <TextView
-                android:id="@+id/selectedItemsText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                style="@style/Base.Theme.NotesProject"
-                android:gravity="center"/>
-            <ImageButton
-                android:id="@+id/chooseSelection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_check_all"
-                android:layout_marginRight="10dp"
-                style="@style/ElementsColor"
-                android:background="@null"/>
-        </LinearLayout>
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchView_home"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_centerInParent="true"
+                app:queryHint="Search notes"></androidx.appcompat.widget.SearchView>
 
-    </RelativeLayout>
+            <LinearLayout
+                android:id="@+id/navLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/cancelSelection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ic_close"
+                    style="@style/ElementsColor"
+                    android:background="@null"/>
+                <TextView
+                    android:id="@+id/selectedItemsText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="@style/Base.Theme.NotesProject"
+                    android:gravity="center"/>
+                <ImageButton
+                    android:id="@+id/chooseSelection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_check_all"
+                    android:layout_marginRight="10dp"
+                    style="@style/ElementsColor"
+                    android:background="@null"/>
+            </LinearLayout>
+
+        </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -103,6 +103,16 @@
                 android:layout_gravity="center"
                 android:layout_margin="16dp"
                 android:src="@drawable/ic_vertical_format"
+                style="@style/ElementsColor"
+                android:background="@null"/>
+
+            <ImageButton
+                android:id="@+id/logOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_logout"
                 style="@style/ElementsColor"
                 android:background="@null"/>
 

@@ -1,34 +1,30 @@
 package com.example.notesproject.Adapters;
 
-import static com.example.notesproject.MainActivity.selectedItemsText;
+import static com.example.notesproject.MainActivityFirebase.selectedItemsText;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Typeface;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.TextAppearanceSpan;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.notesproject.Models.NotesFirebase;
+import com.example.notesproject.NotesClickListenerFirebase;
+import com.example.notesproject.R;
+import com.example.notesproject.Utility.Document;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.firebase.ui.firestore.ObservableSnapshotArray;
+import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.example.notesproject.Database.RoomDB;
-import com.example.notesproject.Models.Notes;
-import com.example.notesproject.NotesClickListener;
-import com.example.notesproject.R;
-import com.google.android.material.card.MaterialCardView;
-import com.makeramen.roundedimageview.RoundedImageView;
-
-import org.w3c.dom.Text;
-
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,60 +33,38 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-
-public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
-
+public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFirebase, NotesListAdapterFirebase.NoteViewHolderFirebase> {
     private Context context;
-    private List<Notes> list;
-    private List<Integer> selectedItems=new ArrayList<>();
-
-    private NotesClickListener listener;
     private boolean isLongClickMode = false;
+    private List<Integer> selectedItems = new ArrayList<>();
+    private NotesClickListenerFirebase listener;
 
-    private String searchQuery = "";
 
-    public NotesListAdapter(Context context, List<Notes> list, NotesClickListener listener) {
+
+    public NotesListAdapterFirebase(@NonNull FirestoreRecyclerOptions<NotesFirebase> options, Context context, NotesClickListenerFirebase listener) {
+        super(options);
         this.context = context;
-        this.list = list;
         this.listener = listener;
     }
 
+
     @NonNull
     @Override
-    public NotesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new NotesViewHolder(LayoutInflater.from(context).inflate(R.layout.notes_list,parent,false));
+    public NoteViewHolderFirebase onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new NoteViewHolderFirebase(LayoutInflater.from(context).inflate(R.layout.notes_list, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NotesViewHolder holder, int position) {
-        holder.textView_title.setText(list.get(position).getTitle());
+    protected void onBindViewHolder(@NonNull NoteViewHolderFirebase holder, int position, @NonNull NotesFirebase note) {
+        holder.textView_title.setText(note.getTitle());
         holder.textView_title.setSelected(true);
-        holder.textView_notes.setText(list.get(position).getNotes());
-        holder.textView_category.setText(list.get(position).getCategory());
+        holder.textView_notes.setText(note.getNotes());
+        holder.textView_category.setText(note.getCategory());
+        setFormattedDate(holder.textView_date,note.getDate());
 
 
 
-        if (list.get(position).getImagePath() != null) {
-            Glide.with(context)
-                    .load(new File(list.get(position).getImagePath()))
-                    .centerCrop()
-                    .override(300, 300)
-                    .into(holder.imageNote);
-
-            holder.imageNote.setVisibility(View.VISIBLE);
-        } else {
-            holder.imageNote.setVisibility(View.GONE);
-        }
-
-        setHighlightText(holder.textView_title, list.get(position).getTitle(), searchQuery);
-        setHighlightText(holder.textView_notes, list.get(position).getNotes(), searchQuery);
-        setHighlightText(holder.textView_category, list.get(position).getCategory(), searchQuery);
-
-        setFormattedDate(holder.textView_date,list.get(position).getDate());
-
-
-
-        if(list.get(position).isPinned()){
+        if(note.isPinned()){
             holder.pinLayot.setVisibility(View.VISIBLE);
         }
         else{
@@ -109,6 +83,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
                 selectedItemsText.setText("Select items");
             }
         }
+
         holder.notes_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,7 +96,10 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
                     }
                     notifyDataSetChanged();
                 } else {
-                    listener.onClick(list.get(holder.getAdapterPosition()));
+                   // listener.onClick(getItem(holder.getAdapterPosition()));
+                    int adapterPosition = holder.getAdapterPosition();
+                    String docId = getSnapshots().getSnapshot(adapterPosition).getId();
+                    listener.onClick(getItem(adapterPosition), docId);
                 }
             }
         });
@@ -141,18 +119,12 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
                     selectedItems.add(adapterPosition);
                 }
                 notifyDataSetChanged();
-                listener.onLongClick(list.get(adapterPosition), holder.notes_container);
+                listener.onLongClick(getItem(adapterPosition), holder.notes_container);
                 return true;
             }
         });
 
     }
-
-    @Override
-    public int getItemCount() {
-        return list.size();
-    }
-
     public void selectItems() {
         if (selectedItems.size() == getItemCount()) {
             clearSelections();
@@ -167,41 +139,43 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
     public void clearSelections() {
         selectedItems.clear();
         notifyDataSetChanged();
-
     }
 
     public void deleteSelectedItems() {
-        RoomDB database = RoomDB.getInstance(context);
+        ObservableSnapshotArray<NotesFirebase> snapshots = getSnapshots();
+        List<Integer> selectedItemsCopy = new ArrayList<>(selectedItems);
 
-        List<Notes> selectedNotes = new ArrayList<>();
-        for (int position : selectedItems) {
-            selectedNotes.add(list.get(position));
+        for (int position : selectedItemsCopy) {
+            DocumentSnapshot snapshot = snapshots.getSnapshot(position);
+            String docId = snapshot.getId();
+
+            DocumentReference documentReference = Document.getCollectionReferenceForNotes().document(docId);
+            documentReference.delete();
         }
 
-        for (Notes note : selectedNotes) {
-            database.mainDAO().delete(note);
-        }
-
-        list.removeAll(selectedNotes);
         selectedItems.clear();
         notifyDataSetChanged();
     }
 
+
     public List<Integer> getSelectedItems() {
         return selectedItems;
     }
-
     public void setLongClickMode(boolean isLongClickMode){
         this.isLongClickMode=isLongClickMode;
     }
-    public boolean getLongClickMode(){return isLongClickMode;}
+
+    public boolean getLongClickMode(){
+        return isLongClickMode;
+    }
+
     private void setFormattedDate(TextView textView, String dateString) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss", Locale.getDefault());
         SimpleDateFormat outputFormat;
         try {
             Date date = inputFormat.parse(dateString);
             Date currentDate = new Date();
-            //Date currentDate = inputFormat.parse("2023.09.17 00:00:00");
+            //Date currentDate = inputFormat.parse("2024.02.04 00:00:00");
             if (isSameDay(date,currentDate)) {
                 outputFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
             }
@@ -249,46 +223,24 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesViewHolder>{
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
     }
 
-    public void filterList(List<Notes> filteredList){
-        list=filteredList;
-        notifyDataSetChanged();
-    }
-    public void setSearchQuery(String query) {
-        searchQuery = query;
-        notifyDataSetChanged();
-    }
+    class NoteViewHolderFirebase extends RecyclerView.ViewHolder{
 
-    private void setHighlightText(TextView textView, String fullText, String query) {
-        int startPos = fullText.toLowerCase().indexOf(query.toLowerCase());
-        int endPos = startPos + query.length();
+        MaterialCardView notes_container;
+        RoundedImageView imageNote;
+        TextView textView_title, textView_notes,textView_category,textView_date;
+        RelativeLayout pinLayot;
 
-        if (startPos != -1) {
-            Spannable spannable = new SpannableString(fullText);
-            ColorStateList colorStateList = new ColorStateList(new int[][]{new int[]{}}, new int[]{context.getResources().getColor(R.color.orange)});
-            TextAppearanceSpan highlightSpan = new TextAppearanceSpan(null, Typeface.BOLD, -1, colorStateList, null);
-            spannable.setSpan(highlightSpan, startPos, endPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            textView.setText(spannable);
-        } else {
-            textView.setText(fullText);
+        public NoteViewHolderFirebase(@NonNull View itemView) {
+            super(itemView);
+            notes_container = itemView.findViewById(R.id.notes_container);
+            textView_title = itemView.findViewById(R.id.textView_title);
+            textView_notes = itemView.findViewById(R.id.textView_notes);
+            textView_category = itemView.findViewById(R.id.textView_category);
+            textView_date = itemView.findViewById(R.id.textView_date);
+            imageNote = itemView.findViewById(R.id.imageNote);
+            pinLayot = itemView.findViewById(R.id.pinLayout);
         }
     }
-
-
 }
-class NotesViewHolder extends RecyclerView.ViewHolder{
 
-    MaterialCardView notes_container;
-    RoundedImageView imageNote;
-    TextView textView_title, textView_notes,textView_category,textView_date;
-    RelativeLayout pinLayot;
-    public NotesViewHolder(@NonNull View itemView) {
-        super(itemView);
-        notes_container = itemView.findViewById(R.id.notes_container);
-        textView_title = itemView.findViewById(R.id.textView_title);
-        textView_notes = itemView.findViewById(R.id.textView_notes);
-        textView_category = itemView.findViewById(R.id.textView_category);
-        textView_date = itemView.findViewById(R.id.textView_date);
-        imageNote = itemView.findViewById(R.id.imageNote);
-        pinLayot = itemView.findViewById(R.id.pinLayout);
-    }
-}
+

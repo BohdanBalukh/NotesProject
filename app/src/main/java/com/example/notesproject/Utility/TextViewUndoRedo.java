@@ -1,5 +1,4 @@
-package com.example.notesproject;
-
+package com.example.notesproject.Utility;
 import java.util.LinkedList;
 
 import android.content.SharedPreferences;
@@ -10,7 +9,16 @@ import android.text.TextWatcher;
 import android.text.style.UnderlineSpan;
 import android.widget.TextView;
 
+/**
+ * A generic undo/redo implementation for TextViews.
+ */
 public class TextViewUndoRedo {
+
+    /**
+     * Is undo/redo being performed? This member signals if an undo/redo
+     * operation is currently being performed. Changes in the text during
+     * undo/redo are not recorded because it would mess up the undo history.
+     */
     private boolean mIsUndoOrRedo = false;
 
     /**
@@ -342,7 +350,7 @@ public class TextViewUndoRedo {
     /**
      * Class that listens to changes in the text.
      */
-    private final class EditTextChangeListener implements TextWatcher{
+    private final class EditTextChangeListener implements TextWatcher {
 
         /**
          * The text that will be removed by the change event.

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -16,8 +17,10 @@ import android.widget.Toast;
 import com.example.notesproject.Utility.UiUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity implements Validable{
 
@@ -36,6 +39,7 @@ public class LoginActivity extends AppCompatActivity implements Validable{
         progressBar = findViewById(R.id.progress_bar);
         createAccountBtnTextView = findViewById(R.id.create_account_text_view_btn);
         forgotPasswordBtnTextView = findViewById(R.id.forgot_password_text_view_btn);
+
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +63,6 @@ public class LoginActivity extends AppCompatActivity implements Validable{
 
     private void loginUser(){
 
-        /*
         String email  = emailEditText.getText().toString();
         String password  = passwordEditText.getText().toString();
 
@@ -67,9 +70,9 @@ public class LoginActivity extends AppCompatActivity implements Validable{
         boolean isValidated = validateData(email,password);
         if(!isValidated){
             return;
-        }*/
+        }
 
-        loginAccountInFirebase("bohdan.baluh@gmail.com","123456");
+        loginAccountInFirebase(email,password);
 
     }
     private void loginAccountInFirebase(String email,String password){
@@ -81,7 +84,7 @@ public class LoginActivity extends AppCompatActivity implements Validable{
                 UiUtils.changeInProgress(progressBar,loginBtn,false);
                 if(task.isSuccessful()){
                     if(firebaseAuth.getCurrentUser().isEmailVerified()){
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        startActivity(new Intent(LoginActivity.this, MainActivityFirebase.class));
                         finish();
                     }else{
                         Toast.makeText(LoginActivity.this,"Email is not verified. Please verify your email", Toast.LENGTH_SHORT).show();
@@ -93,6 +96,11 @@ public class LoginActivity extends AppCompatActivity implements Validable{
             }
         });
     }
+
+
+
+
+
     @Override
     public boolean validateData(String... data) {
         String email = data[0];
