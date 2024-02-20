@@ -32,6 +32,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 import java.io.File;
@@ -54,7 +55,6 @@ public class MainActivity extends AppCompatActivity{
     private ImageView notesEmptyImage;
     private TextView notesEmptyText;
     //private TextView notesEmptyText, selectedItemsText;
-
     private boolean isGridMode = true;
     private boolean hasUpdateUICalled = false;
 

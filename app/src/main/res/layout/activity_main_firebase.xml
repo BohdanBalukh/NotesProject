@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    tools:openDrawer="start"
     style="@style/Base.Theme.NotesProject"
-    tools:context=".MainActivity">
+    tools:context=".MainActivityFirebase">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_notes1"
         android:layout_width="match_parent"
@@ -22,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_centerInParent="true"
-                app:queryHint="Search notes"></androidx.appcompat.widget.SearchView>
+                app:queryHint="Search notes" />
 
             <LinearLayout
                 android:id="@+id/navLayout"
@@ -95,28 +100,31 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:gravity="start">
+            android:gravity="center">
             <ImageButton
-                android:id="@+id/switchGridMode"
+                android:id="@+id/googleAccountButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_margin="16dp"
-                android:src="@drawable/ic_vertical_format"
                 style="@style/ElementsColor"
+                android:src="@drawable/default_profile_image"
                 android:background="@null"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
-            <ImageButton
-                android:id="@+id/logOut"
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/floatingActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_margin="16dp"
-                android:src="@drawable/ic_logout"
-                style="@style/ElementsColor"
-                android:background="@null"/>
-
+                android:backgroundTint="@color/orange"
+                app:tint="@color/white"
+                android:src="@drawable/ic_add" />
         </LinearLayout>
+
+
         <LinearLayout
             android:id="@+id/buttonLayout"
             android:layout_width="match_parent"
@@ -150,15 +158,15 @@
                 style="@style/ElementsColor"
                 android:background="@null"/>
         </LinearLayout>
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            android:backgroundTint="@color/orange"
-            app:tint="@color/white"
-            android:src="@drawable/ic_add" />
     </FrameLayout>
+    </RelativeLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        style="@style/ColorBackgroundMenu"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/nav_menu"
+        android:layout_gravity="start"/>
 
-</RelativeLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

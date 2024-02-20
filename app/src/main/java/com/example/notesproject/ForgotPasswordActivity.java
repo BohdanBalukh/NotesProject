@@ -2,7 +2,9 @@ package com.example.notesproject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -28,7 +30,6 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Validab
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
-
         goBackToLogin = findViewById(R.id.goBackToLogin);
         passwordRecoverButton=findViewById(R.id.passwordRecoverButton);
         emailToRecoverPassword = findViewById(R.id.emailToRecoverPassword);

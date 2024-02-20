@@ -4,25 +4,40 @@ import static com.example.notesproject.MainActivityFirebase.selectedItemsText;
 
 import android.content.Context;
 
+import android.content.res.ColorStateList;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.notesproject.Models.NotesFirebase;
 import com.example.notesproject.NotesClickListenerFirebase;
 import com.example.notesproject.R;
 import com.example.notesproject.Utility.Document;
+import com.example.notesproject.Utility.UiUtils;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.firebase.ui.firestore.ObservableSnapshotArray;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
@@ -39,6 +54,7 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
     private List<Integer> selectedItems = new ArrayList<>();
     private NotesClickListenerFirebase listener;
 
+    private String searchQuery = "";
 
 
     public NotesListAdapterFirebase(@NonNull FirestoreRecyclerOptions<NotesFirebase> options, Context context, NotesClickListenerFirebase listener) {
@@ -62,7 +78,32 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
         holder.textView_category.setText(note.getCategory());
         setFormattedDate(holder.textView_date,note.getDate());
 
+        if (note.getImageUrl() != null && !note.getImageUrl().isEmpty()) {
+            UiUtils.changeInProgress(holder.progressBar_loadingImage, true);
 
+            holder.imageNote.setImageDrawable(null);
+            Glide.with(context)
+                    .load(note.getImageUrl())
+                    .centerCrop()
+                    .override(300, 300)
+                    .into(new CustomTarget<Drawable>() {
+                        @Override
+                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                            UiUtils.changeInProgress(holder.progressBar_loadingImage, false);
+                            holder.imageNote.setVisibility(View.VISIBLE);
+                            holder.imageNote.setImageDrawable(resource);
+                        }
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                        }
+                    });
+        } else {
+            holder.imageNote.setVisibility(View.GONE);
+        }
+
+        setHighlightText(holder.textView_title, note.getTitle(), searchQuery);
+        setHighlightText(holder.textView_notes, note.getNotes(), searchQuery);
+        setHighlightText(holder.textView_category, note.getCategory(), searchQuery);
 
         if(note.isPinned()){
             holder.pinLayot.setVisibility(View.VISIBLE);
@@ -87,8 +128,8 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
         holder.notes_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int adapterPosition = holder.getAdapterPosition();
                 if (isLongClickMode) {
-                    int adapterPosition = holder.getAdapterPosition();
                     if (selectedItems.contains(adapterPosition)) {
                         selectedItems.remove(Integer.valueOf(adapterPosition));
                     } else {
@@ -96,8 +137,6 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
                     }
                     notifyDataSetChanged();
                 } else {
-                   // listener.onClick(getItem(holder.getAdapterPosition()));
-                    int adapterPosition = holder.getAdapterPosition();
                     String docId = getSnapshots().getSnapshot(adapterPosition).getId();
                     listener.onClick(getItem(adapterPosition), docId);
                 }
@@ -148,7 +187,11 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
         for (int position : selectedItemsCopy) {
             DocumentSnapshot snapshot = snapshots.getSnapshot(position);
             String docId = snapshot.getId();
-
+            NotesFirebase note = snapshot.toObject(NotesFirebase.class);
+            if (note != null && note.getImageUrl() != null) {
+                StorageReference imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(note.getImageUrl());
+                imageRef.delete();
+            }
             DocumentReference documentReference = Document.getCollectionReferenceForNotes().document(docId);
             documentReference.delete();
         }
@@ -223,9 +266,39 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
     }
 
+
+    public void setSearchQuery(String query) {
+        searchQuery = query;
+        notifyDataSetChanged();
+    }
+    public void setFilterQuery(String query) {
+        Query filteredQuery = Document.getCollectionReferenceForNotes()
+                .whereEqualTo("notes", query);
+        FirestoreRecyclerOptions<NotesFirebase> filteredOptions = new FirestoreRecyclerOptions.Builder<NotesFirebase>()
+                .setQuery(filteredQuery, NotesFirebase.class).build();
+        updateOptions(filteredOptions);
+    }
+
+
+    private void setHighlightText(TextView textView, String fullText, String query) {
+        int startPos = fullText.toLowerCase().indexOf(query.toLowerCase());
+        int endPos = startPos + query.length();
+
+        if (startPos != -1) {
+            Spannable spannable = new SpannableString(fullText);
+            ColorStateList colorStateList = new ColorStateList(new int[][]{new int[]{}}, new int[]{context.getResources().getColor(R.color.orange)});
+            TextAppearanceSpan highlightSpan = new TextAppearanceSpan(null, Typeface.BOLD, -1, colorStateList, null);
+            spannable.setSpan(highlightSpan, startPos, endPos, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            textView.setText(spannable);
+        } else {
+            textView.setText(fullText);
+        }
+    }
+
     class NoteViewHolderFirebase extends RecyclerView.ViewHolder{
 
         MaterialCardView notes_container;
+        ProgressBar progressBar_loadingImage;
         RoundedImageView imageNote;
         TextView textView_title, textView_notes,textView_category,textView_date;
         RelativeLayout pinLayot;
@@ -237,6 +310,7 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
             textView_notes = itemView.findViewById(R.id.textView_notes);
             textView_category = itemView.findViewById(R.id.textView_category);
             textView_date = itemView.findViewById(R.id.textView_date);
+            progressBar_loadingImage = itemView.findViewById(R.id.progressBar_loadingImage);
             imageNote = itemView.findViewById(R.id.imageNote);
             pinLayot = itemView.findViewById(R.id.pinLayout);
         }

@@ -35,6 +35,18 @@
                     android:layout_height="match_parent"
                     style="@style/ElementsColor" />
             </FrameLayout>
+            <TextView
+                android:id="@+id/textForWait"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="80dp"
+                android:textSize="20sp"
+                android:layout_alignRight="@+id/frameSaveAnim"
+                android:visibility="gone"
+                android:textStyle="bold"
+                android:text="Please, wait..."/>
             <ImageView
                 android:id="@+id/imageView_undo"
                 android:layout_width="?attr/actionBarSize"
@@ -155,6 +167,13 @@
             android:src="@drawable/ic_delete"
             style="@style/ElementsColor"
             android:visibility="gone"
+            android:background="@null" />
+        <ImageButton
+            android:id="@+id/taskReminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_reminder"
+            style="@style/ElementsColor"
             android:background="@null" />
     </LinearLayout>
 </LinearLayout>

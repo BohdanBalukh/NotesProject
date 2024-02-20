@@ -5,13 +5,14 @@ public class NotesFirebase {
     private String notes;
     private String category;
     private String date;
-    boolean pinned = false;
+    private boolean pinned=false;
+    private String imageUrl;
+
     public NotesFirebase(){};
 
     public String getTitle() {
         return title;
     }
-
 
     public void setTitle(String title) {
         this.title = title;
@@ -49,4 +50,11 @@ public class NotesFirebase {
         this.pinned = pinned;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

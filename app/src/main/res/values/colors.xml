@@ -7,5 +7,7 @@
     <color name="main_gray">#E5E4E2</color>
     <color name="simple_gray">#808080</color>
     <color name="orange">#FFA500</color>
+    <color name="green">#006A4E</color>
+    <color name="purple">#702963</color>
     <color name="transparent">#00000000</color>
 </resources>

@@ -2,8 +2,11 @@ package com.example.notesproject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Patterns;
@@ -22,6 +25,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Objects;
+
 public class LoginActivity extends AppCompatActivity implements Validable{
 
     EditText emailEditText,passwordEditText;
@@ -32,7 +37,6 @@ public class LoginActivity extends AppCompatActivity implements Validable{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         emailEditText = findViewById(R.id.email_edit_text);
         passwordEditText = findViewById(R.id.password_edit_text);
         loginBtn = findViewById(R.id.login_btn);
@@ -88,6 +92,7 @@ public class LoginActivity extends AppCompatActivity implements Validable{
                         finish();
                     }else{
                         Toast.makeText(LoginActivity.this,"Email is not verified. Please verify your email", Toast.LENGTH_SHORT).show();
+                        firebaseAuth.signOut();
                     }
 
                 }else{
@@ -96,9 +101,6 @@ public class LoginActivity extends AppCompatActivity implements Validable{
             }
         });
     }
-
-
-
 
 
     @Override

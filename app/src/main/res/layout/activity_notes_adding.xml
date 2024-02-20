@@ -112,6 +112,7 @@
                 android:padding="20dp"
                 app:riv_corner_radius="15dp"
                 android:visibility="gone"/>
+
     <EditText
         android:id="@+id/editText_notes"
         android:layout_width="match_parent"
