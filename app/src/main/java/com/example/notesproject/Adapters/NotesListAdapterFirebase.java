@@ -7,12 +7,16 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,6 +42,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
@@ -48,14 +53,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFirebase, NotesListAdapterFirebase.NoteViewHolderFirebase> {
+public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFirebase, NotesListAdapterFirebase.NoteViewHolderFirebase>{
     private Context context;
     private boolean isLongClickMode = false;
     private List<Integer> selectedItems = new ArrayList<>();
     private NotesClickListenerFirebase listener;
-
     private String searchQuery = "";
-
 
     public NotesListAdapterFirebase(@NonNull FirestoreRecyclerOptions<NotesFirebase> options, Context context, NotesClickListenerFirebase listener) {
         super(options);
@@ -100,6 +103,27 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
         } else {
             holder.imageNote.setVisibility(View.GONE);
         }
+        if (note.getReminderTime() != null && !note.getReminderTime().isEmpty()) {
+            holder.textReminderAdapter.setText(note.getReminderTime());
+            holder.imageReminderLayoutAdapter.setVisibility(View.VISIBLE);
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy HH:mm", Locale.getDefault());
+                Date reminderDate = dateFormat.parse(note.getReminderTime());
+                Date currentDate = new Date();
+
+                if (currentDate.after(reminderDate)) {
+                    holder.imageReminderIconAdapter.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.red)));
+
+                } else {
+                    holder.imageReminderIconAdapter.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        } else {
+            holder.textReminderAdapter.setText("");
+            holder.imageReminderLayoutAdapter.setVisibility(View.GONE);
+        }
 
         setHighlightText(holder.textView_title, note.getTitle(), searchQuery);
         setHighlightText(holder.textView_notes, note.getNotes(), searchQuery);
@@ -135,7 +159,8 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
                     } else {
                         selectedItems.add(adapterPosition);
                     }
-                    notifyDataSetChanged();
+                    //notifyDataSetChanged();
+                    notifyItemChanged(adapterPosition);
                 } else {
                     String docId = getSnapshots().getSnapshot(adapterPosition).getId();
                     listener.onClick(getItem(adapterPosition), docId);
@@ -157,7 +182,8 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
                 } else {
                     selectedItems.add(adapterPosition);
                 }
-                notifyDataSetChanged();
+               // notifyDataSetChanged();
+                notifyItemChanged(adapterPosition);
                 listener.onLongClick(getItem(adapterPosition), holder.notes_container);
                 return true;
             }
@@ -172,13 +198,16 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
             for (int i = 0; i < getItemCount(); i++) {
                 selectedItems.add(i);
             }
-            notifyDataSetChanged();
+           notifyDataSetChanged();
         }
     }
+
     public void clearSelections() {
         selectedItems.clear();
         notifyDataSetChanged();
     }
+
+
 
     public void deleteSelectedItems() {
         ObservableSnapshotArray<NotesFirebase> snapshots = getSnapshots();
@@ -236,6 +265,10 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
             textView.setText(inputFormat.format(CatchDate));
         }
     }
+
+
+
+
     private boolean isSameDay(Date date1, Date date2) {
         Calendar cal1 = Calendar.getInstance();
         cal1.setTime(date1);
@@ -300,8 +333,9 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
         MaterialCardView notes_container;
         ProgressBar progressBar_loadingImage;
         RoundedImageView imageNote;
-        TextView textView_title, textView_notes,textView_category,textView_date;
-        RelativeLayout pinLayot;
+        TextView textView_title, textView_notes,textView_category,textView_date, textReminderAdapter;
+        RelativeLayout pinLayot, imageReminderLayoutAdapter;
+        ImageView imageReminderIconAdapter, pinIcon;
 
         public NoteViewHolderFirebase(@NonNull View itemView) {
             super(itemView);
@@ -312,7 +346,13 @@ public class NotesListAdapterFirebase extends FirestoreRecyclerAdapter<NotesFire
             textView_date = itemView.findViewById(R.id.textView_date);
             progressBar_loadingImage = itemView.findViewById(R.id.progressBar_loadingImage);
             imageNote = itemView.findViewById(R.id.imageNote);
+
+            imageReminderLayoutAdapter = itemView.findViewById(R.id.imageReminderLayoutAdapter);
+            imageReminderIconAdapter = itemView.findViewById(R.id.imageReminderIconAdapter);
+            textReminderAdapter = itemView.findViewById(R.id.textReminderAdapter);
+
             pinLayot = itemView.findViewById(R.id.pinLayout);
+            pinIcon = itemView.findViewById(R.id.pinIcon);
         }
     }
 }

@@ -23,7 +23,6 @@ public class Notes implements Serializable {
     String date = "";
     @ColumnInfo(name="imagePath")
     String imagePath;
-
     @ColumnInfo(name = "pinned")
     boolean pinned = false;
 

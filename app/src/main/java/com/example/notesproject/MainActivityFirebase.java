@@ -34,6 +34,7 @@ import com.example.notesproject.Adapters.NotesListAdapterFirebase;
 import com.example.notesproject.Models.NotesFirebase;
 import com.example.notesproject.Utility.Document;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -42,6 +43,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +121,7 @@ public class MainActivityFirebase extends AppCompatActivity {
                     overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
                     drawerLayout.close();
                 }
+
                 if(itemId == R.id.nav_pinned){
                     Query query;
                     if(isPinnedMode){
@@ -148,7 +151,7 @@ public class MainActivityFirebase extends AppCompatActivity {
 
                 if(itemId == R.id.nav_themes){
                     BottomSheetDialog dialog = new BottomSheetDialog(MainActivityFirebase.this);
-                    dialog.setContentView(R.layout.bottomsheetlayout);
+                    dialog.setContentView(R.layout.change_theme_layout);
 
                     MaterialCardView asSystemTheme = dialog.findViewById(R.id.asSystemTheme);
                     MaterialCardView lightTheme = dialog.findViewById(R.id.lightTheme);
@@ -465,6 +468,8 @@ public class MainActivityFirebase extends AppCompatActivity {
        recyclerView.setAdapter(notesListAdapter);
         updateEmptyStateVisibility();
     }
+
+
 
 
     @Override

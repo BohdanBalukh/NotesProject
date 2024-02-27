@@ -7,6 +7,7 @@ public class NotesFirebase {
     private String date;
     private boolean pinned=false;
     private String imageUrl;
+    private String reminderTime;
 
     public NotesFirebase(){};
 
@@ -56,5 +57,12 @@ public class NotesFirebase {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getReminderTime() {
+        return reminderTime;
+    }
+    public void setReminderTime(String reminderTime) {
+        this.reminderTime = reminderTime;
     }
 }

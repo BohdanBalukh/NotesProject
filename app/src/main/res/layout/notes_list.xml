@@ -33,6 +33,30 @@
                 android:indeterminateTint="@color/orange"
                 android:visibility="gone" />
         </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/imageReminderLayoutAdapter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:visibility="gone">
+            <ImageView
+                android:id="@+id/imageReminderIconAdapter"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_reminder"
+                android:layout_gravity="center_vertical"
+                app:tint="@color/orange" />
+            <TextView
+                android:id="@+id/textReminderAdapter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/imageReminderIconAdapter"
+                android:layout_marginStart="8dp"
+                android:textSize="14sp"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -104,6 +128,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone">
             <ImageView
+                android:id="@+id/pinIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"

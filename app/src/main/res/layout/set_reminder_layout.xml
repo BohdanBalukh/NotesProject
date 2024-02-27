@@ -1,0 +1,87 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="50dp"
+    style="@style/ColorBackgroundMenu">
+
+    <View
+        android:layout_width="50dp"
+        android:layout_height="4dp"
+        style="@style/ElementsBackground"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/setReminderText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="10dp"
+        android:textStyle="bold"
+        android:text="Set reminder"
+        style="@style/ElementsColor"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/currentReminderText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_marginBottom="10dp"
+        style="@style/ElementsColor"
+        android:textSize="15sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <DatePicker
+            android:id="@+id/datePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:calendarViewShown="false"
+            android:layout_marginLeft="8dp"
+            android:datePickerMode="spinner"
+            android:descendantFocusability="blocksDescendants" />
+
+        <TimePicker
+            android:id="@+id/timePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:timePickerMode="spinner"
+            android:descendantFocusability="blocksDescendants"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="120dp"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/light_gray"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:layout_marginEnd="16dp" />
+
+        <Button
+            android:id="@+id/btnOk"
+            android:layout_width="120dp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/orange"
+            android:layout_height="wrap_content"
+            android:text="OK" />
+
+    </LinearLayout>
+
+</LinearLayout>
